@@ -11,7 +11,7 @@ import {
     TouchableOpacity,
     Dimensions
 } from 'react-native';
-
+const {width, height} = Dimensions.get('window')
 const reactNativePackage = require('react-native/package.json');
 const splitVersion = reactNativePackage.version.split('.');
 const majorVersion = +splitVersion[0];
@@ -20,7 +20,7 @@ const minorVersion = +splitVersion[1];
 const styles = StyleSheet.create({
     container: {
         flexDirection: 'row',
-        backgroundColor: '#222'
+        backgroundColor: 'white'
     },
     buttons: {
         height: 15,
@@ -35,12 +35,19 @@ const styles = StyleSheet.create({
         width: 8,
         height: 8,
         borderRadius: 8 / 2,
-        backgroundColor: '#ccc',
+        backgroundColor: 'black',
         opacity: 0.9
     },
     buttonSelected: {
-        opacity: 1,
-        backgroundColor: '#fff',
+        width: 10,
+        height: 10,
+        borderRadius: 5,
+        backgroundColor: '#ff5252',
+        opacity: 1
+    },
+    image : {
+        width : width,
+        height: height
     }
 });
 
@@ -147,7 +154,7 @@ export default class ImageSlider extends Component {
                     const imageComponent = <Image
                         key={index}
                         source={imageObject}
-                        style={{height, width}}
+                        style={[styles.image, this.props.imageStyle]}
                     />;
                     if (this.props.onPress) {
                         return (
@@ -165,7 +172,7 @@ export default class ImageSlider extends Component {
                     }
                 })}
             </ScrollView>
-            <View style={styles.buttons}>
+            <View style={[styles.buttons, this.props.dotStyle]}>
                 {this.props.images.map((image, index) => {
                     return (<TouchableHighlight
                         key={index}
@@ -173,7 +180,7 @@ export default class ImageSlider extends Component {
                         onPress={() => {
                             return this._move(index);
                         }}
-                        style={[styles.button, position === index && styles.buttonSelected]}>
+                        style={[styles.button, position === index && styles.buttonSelected, this.props.activeDotStyle]}>
                         <View></View>
                     </TouchableHighlight>);
                 })}
