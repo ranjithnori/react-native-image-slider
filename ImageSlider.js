@@ -11,6 +11,9 @@ import {
     TouchableOpacity,
     Dimensions
 } from 'react-native';
+
+import PhotoView from 'react-native-photo-view';
+
 const {width, height} = Dimensions.get('window')
 const reactNativePackage = require('react-native/package.json');
 const splitVersion = reactNativePackage.version.split('.');
@@ -61,6 +64,10 @@ export default class ImageSlider extends Component {
             width: Dimensions.get('window').width,
             scrolling: false,
         };
+    }
+
+    static defaultProps = {
+        zoomable: false
     }
 
     _onRef(ref) {
@@ -134,13 +141,37 @@ export default class ImageSlider extends Component {
     }
 
     componentWillUnmount() {
-        clearInterval(this._interval);
+      clearInterval(this._interval);
+    }
+
+    _onTap = (log) => {
+      console.log('log', log)
+      if(this.props.onPress){
+        this.props.onPress()
+      }
+    }
+
+    _getRenderComponent = (index, imageObject, zoomable) => {
+      return zoomable ? <PhotoView
+        key={index}
+        source={imageObject}
+        minimumZoomScale={1}
+        maximumZoomScale={3}
+        androidScaleType="center"
+        onLoad={() => console.log("Image loaded!")}
+        onTap={this._onTap}
+        style={[styles.image, this.props.imageStyle]}
+      /> : <Image
+      key={index}
+      source={imageObject}
+      style={[styles.image, this.props.imageStyle]} />
     }
 
     render() {
         const width = this.state.width;
         const height = this.props.height || this.state.height;
         const position = this._getPosition();
+        const {zoomable} = this.props;
         return (<View>
             <ScrollView
                 ref={ref => this._onRef(ref)}
@@ -151,11 +182,7 @@ export default class ImageSlider extends Component {
                 style={[styles.container, this.props.style, {height: height}]}>
                 {this.props.images.map((image, index) => {
                     const imageObject = typeof image === 'string' ? {uri: image} : image;
-                    const imageComponent = <Image
-                        key={index}
-                        source={imageObject}
-                        style={[styles.image, this.props.imageStyle]}
-                    />;
+                    const imageComponent = this._getRenderComponent(index, imageObject, zoomable)
                     if (this.props.onPress) {
                         return (
                             <TouchableOpacity
